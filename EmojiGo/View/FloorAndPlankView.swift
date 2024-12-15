@@ -48,7 +48,7 @@ class FloorAndPlankView {
         plankNode.position = SCNVector3(0, -0.35, -3.0)
         plankNode.name = "plank"
 
-        let emojiTextures = ["anger", "contempt", "fear", "happy", "surprise"]
+        let emojiTextures = ["anger", "fear", "happy", "surprise"]
         if let randomEmoji = emojiTextures.randomElement(), let emojiImage = UIImage(named: randomEmoji) {
             let emojiPlane = SCNPlane(width: 0.3, height: 0.2)
             emojiPlane.firstMaterial?.diffuse.contents = emojiImage

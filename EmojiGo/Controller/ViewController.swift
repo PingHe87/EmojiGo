@@ -22,6 +22,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     private var floorAndPlankView: FloorAndPlankView!
     
     private var hasStartedFaceDetection = false // 防止重复启动表情检测
+    private var preStartCountdownLabel: UILabel! // 用于显示 "3, 2, 1, Go!"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,8 +41,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
         gameView = GameView(frame: view.bounds)
         gameView.setupUI(in: view)
         
-        // 启动游戏
-        setupGame() // 添加这一行，初始化倒计时
+        // 启动游戏的预启动倒计时
+        startPreStartCountdown()
+        
+//        // 启动游戏
+//        setupGame() // 添加这一行，初始化倒计时
 
         // 延迟启动表情检测
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -49,7 +53,41 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
             self.startFaceDetection()
         }
     }
+    // MARK: - 游戏预启动倒计时
+        private func startPreStartCountdown() {
+            preStartCountdownLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+            preStartCountdownLabel.center = view.center
+            preStartCountdownLabel.textAlignment = .center
+            preStartCountdownLabel.font = UIFont.boldSystemFont(ofSize: 48)
+            preStartCountdownLabel.textColor = .white
+            preStartCountdownLabel.text = "3"
+            view.addSubview(preStartCountdownLabel)
 
+            var countdownValue = 3
+
+            // 倒计时逻辑
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+                guard let self = self else { return }
+
+                if countdownValue > 1 {
+                    countdownValue -= 1
+                    self.preStartCountdownLabel.text = "\(countdownValue)"
+                } else if countdownValue == 1 {
+                    self.preStartCountdownLabel.text = "Go!"
+                    countdownValue -= 1
+                } else {
+                    // 倒计时结束，移除标签并启动游戏
+                    self.preStartCountdownLabel.removeFromSuperview()
+                    timer.invalidate()
+                    self.startGame()
+                }
+            }
+        }
+    // MARK: - 启动游戏
+        private func startGame() {
+            setupGame()
+            startFaceDetection()
+        }
     
     private func setupGame() {
         gameModel.reset()
