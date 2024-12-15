@@ -130,6 +130,7 @@ class GameView {
     @objc private func homeTapped(_ sender: UIButton) {
         homeHandler?()
     }
+    
 
     private var restartHandler: (() -> Void)?
     private var homeHandler: (() -> Void)?
