@@ -35,6 +35,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
         // 添加初始地板
         floorAndPlankView = FloorAndPlankView(sceneView: sceneView)
         floorAndPlankView.addInitialFloors()
+        // 启动木板固定间隔刷新
+            floorAndPlankView.startPlankRefreshTimer()
 
         // 初始化其他组件
         emotionAnalyzer = EmotionAnalyzer() // 确保初始化
@@ -117,18 +119,41 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     }
 
     private func handleDetectedEmotion(_ detectedEmotion: String) {
-        print("Detected Emotion: \(detectedEmotion)")
-        print("Current Plank Emoji: \(String(describing: gameModel.currentPlankEmoji))")
-        
-        let isCorrect = gameModel.checkEmotionMatch(detectedEmotion: detectedEmotion)
-        gameView.updateDetectedEmotionLabel(with: detectedEmotion, isCorrect: isCorrect)
-        
+        // 只允许 "fear", "happy", "surprise" 这三个表情
+        let validEmotions = ["fear", "happy", "surprise"]
+
+        // 检查检测到的表情是否在允许范围内
+        let normalizedEmotion = detectedEmotion.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard validEmotions.contains(normalizedEmotion) else {
+            print("Ignored Emotion: \(detectedEmotion)") // 忽略无效表情
+            return
+        }
+
+        // 确保当前木板存在且尚未进行判定
+        guard let currentPlankEmoji = GameModel.shared.currentPlankEmoji,
+              !GameModel.shared.hasScoredOnCurrentPlank else {
+            print("No plank to score or already scored.")
+            return
+        }
+
+        print("Detected Emotion: \(normalizedEmotion)")
+        print("Current Plank Emoji: \(currentPlankEmoji)")
+
+        // 判定是否匹配
+        let isCorrect = GameModel.shared.checkEmotionMatch(detectedEmotion: normalizedEmotion)
+
+        // 更新 UI，显示匹配结果
+        gameView.updateDetectedEmotionLabel(with: normalizedEmotion, isCorrect: isCorrect)
+
+        // 输出结果
         if isCorrect {
-            print("Matched! Current Score: \(gameModel.score)")
+            print("Matched! Current Score: \(GameModel.shared.score)")
         } else {
-            print("No Match! Score remains: \(gameModel.score)")
+            print("No Match! Score remains: \(GameModel.shared.score)")
         }
     }
+
+
 
     // MARK: - Countdown Timer
     private func startCountdown() {
@@ -171,9 +196,15 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     }
 
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        // 滑动地板和木板
+        if let detectedEmotion = GameModel.shared.detectedEmotion {
+            // 如果木板在屏幕上且尚未判定分数
+            if floorAndPlankView.isPlankOnScreen, !GameModel.shared.hasScoredOnCurrentPlank {
+                _ = GameModel.shared.checkEmotionMatch(detectedEmotion: detectedEmotion)
+            }
+        }
         floorAndPlankView.slideFloorsAndPlanks()
-        floorAndPlankView.addPlank()
     }
+
+
 }
 
