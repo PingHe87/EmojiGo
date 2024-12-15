@@ -6,9 +6,33 @@ This game is a tunnel adventure game based on facial expression recognition. Pla
 - The obstacles may feature several possible emojis, such as a **happy face**, a **fearful face**, or a **surprised face**.  
 - When the player’s expression matches the emoji on the obstacle, they **successfully pass through** and continue advancing.  
 - The goal is to **avoid all obstacles** and complete the tunnel.  
-- The game is simple and intuitive to play, offering both **fun and challenges** through real-time interactions.  
-
+- The game is simple and intuitive to play, offering both **fun and challenges** through real-time interactions.
 ---
+## **Contents**
+- **EmojiGo/**
+  - **AR/**
+    - ARSetup
+  - **Controller/**
+    - ViewController
+  - **CoreML/**
+    - EmojiChallengeClassifier
+    - EmotionAnalyzer
+    - ImagePreprocessor
+  - **Model/**
+    - GameModel
+  - **View/**
+    - FloorAndPlankView
+    - GameView
+    - HomeViewController
+  - AppDelegate
+  - **art/**
+  - **Assets/**
+    - failure.wav
+    - success.wav
+  - LaunchScreen
+  - Main
+
+
 
 ## **Constraints**
 
