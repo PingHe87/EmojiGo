@@ -24,6 +24,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     private var hasStartedFaceDetection = false // 防止重复启动表情检测
     private var preStartCountdownLabel: UILabel! // 用于显示 "3, 2, 1, Go!"
     
+    private let imagePreprocessor = ImagePreprocessor() // 添加预处理器实例
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -99,24 +102,27 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
 
     // MARK: - Face Detection
     private func startFaceDetection() {
-        guard !hasStartedFaceDetection else { return } // 防止重复启动
-        hasStartedFaceDetection = true
-
         Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
-            guard let self = self, let frame = self.sceneView.session.currentFrame else {
+            guard let self = self,
+                  let frame = self.sceneView.session.currentFrame else {
                 print("ARSession currentFrame is unavailable...")
                 return
             }
-
-            // 分析当前帧
-            self.emotionAnalyzer.analyze(pixelBuffer: frame.capturedImage) { detectedEmotion in
-                DispatchQueue.main.async {
-                    guard let detectedEmotion = detectedEmotion else { return }
-                    self.handleDetectedEmotion(detectedEmotion)
+            
+            // 对帧进行预处理
+            if let processedPixelBuffer = self.imagePreprocessor.process(pixelBuffer: frame.capturedImage) {
+                self.emotionAnalyzer.analyze(pixelBuffer: processedPixelBuffer) { detectedEmotion in
+                    DispatchQueue.main.async {
+                        guard let detectedEmotion = detectedEmotion else { return }
+                        self.handleDetectedEmotion(detectedEmotion)
+                    }
                 }
+            } else {
+                print("Failed to process pixel buffer.")
             }
         }
     }
+
 
     private func handleDetectedEmotion(_ detectedEmotion: String) {
         // 只允许 "fear", "happy", "surprise" 这三个表情

@@ -89,23 +89,32 @@ class FloorAndPlankView {
        }
 
     func slideFloorsAndPlanks() {
+        // 遍历所有的节点
         for node in sceneView.scene.rootNode.childNodes {
+            // 检查节点是否为 "floor" 或 "plank"
             if node.name == "floor" || node.name == "plank" {
+                // 滑动节点
                 node.position.z += 0.036
 
-                // 如果地板或木板滑出视野
+                // 检查节点是否滑出视野
                 if node.position.z > 1.0 {
-                    // 对木板进行判定
+                    
+                    // 木板滑出视野时进行判定
                     if node.name == "plank" {
                         if !GameModel.shared.hasScoredOnCurrentPlank {
                             print("Plank missed without scoring.")
                             GameModel.shared.playFailureSound() // 播放失败音效
                         }
-                        isPlankOnScreen = false // 标记木板移除
+                        // 重置状态
+                        isPlankOnScreen = false
+                        GameModel.shared.currentPlankEmoji = nil
+                        GameModel.shared.hasScoredOnCurrentPlank = false
                     }
+
+                    // 移除滑出的节点
                     node.removeFromParentNode()
 
-                    // 为滑出的地板添加新的地板
+                    // 为地板重新生成新的地板
                     if node.name == "floor" {
                         let newFloor = createFloor(at: SCNVector3(0, -0.5, -4.5)) // 新地板位置
                         sceneView.scene.rootNode.addChildNode(newFloor)
@@ -114,6 +123,7 @@ class FloorAndPlankView {
             }
         }
     }
+
 
 
 }

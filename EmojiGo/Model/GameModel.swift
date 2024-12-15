@@ -13,14 +13,16 @@ class GameModel {
     static let shared = GameModel()
     var audioPlayer: AVAudioPlayer?
     
-    var detectedEmotion: String? = nil
+    var detectedEmotion: String? = nil // 当前检测到的表情
     
     private init() {} // 防止外部初始化
 
+    // 游戏状态变量
     var isPlankOnScreen = false
     var countdownValue = 20
     var score = 0 // 游戏分数
 
+    // 当前木板状态
     var matchingTime: TimeInterval = 0 // 匹配时间累计
     var currentPlankEmoji: String? // 当前木板上的表情
     var hasScoredOnCurrentPlank = false // 是否已经为当前木板计分
@@ -31,10 +33,15 @@ class GameModel {
         isPlankOnScreen = false
         countdownValue = 20
         score = 0
-        matchingTime = 0
+        resetCurrentPlankState() // 重置当前木板状态
+    }
+
+    // 重置当前木板状态
+    func resetCurrentPlankState() {
         currentPlankEmoji = nil
         hasScoredOnCurrentPlank = false
         hasFailedOnCurrentPlank = false
+        detectedEmotion = nil // 清空检测到的表情，确保下一块木板可以正常匹配
     }
 
     // 更新倒计时
@@ -64,7 +71,6 @@ class GameModel {
         return false
     }
 
-    
     // 播放成功音效
     func playSuccessSound() {
         playSound(resourceName: "success")
@@ -74,7 +80,7 @@ class GameModel {
     func playFailureSound() {
         playSound(resourceName: "failure")
     }
-    
+
     // 通用音效播放方法
     private func playSound(resourceName: String) {
         guard let soundURL = Bundle.main.url(forResource: resourceName, withExtension: "wav") else {
@@ -99,3 +105,4 @@ class GameModel {
         }
     }
 }
+
