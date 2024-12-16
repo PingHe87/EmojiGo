@@ -21,7 +21,7 @@ class FloorAndPlankView {
     // 启动木板刷新定时器，每3秒触发一次
         func startPlankRefreshTimer() {
             plankTimer?.invalidate() // 确保之前的定时器被清理
-            plankTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
+            plankTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
                 self?.addPlank()
             }
         }

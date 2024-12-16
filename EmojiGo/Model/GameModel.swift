@@ -51,24 +51,31 @@ class GameModel {
     }
 
     // 检查表情匹配
+    // 检查表情匹配
     func checkEmotionMatch(detectedEmotion: String) -> Bool {
-        guard let currentPlankEmoji = currentPlankEmoji, !hasScoredOnCurrentPlank else { return false }
-        
+        // 确保当前有木板表情并且尚未判定得分
+        guard let currentPlankEmoji = currentPlankEmoji, !hasScoredOnCurrentPlank else {
+            return false
+        }
+
+        // 标准化表情和木板表情，去除空格并转为小写
         let normalizedDetected = detectedEmotion.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         let normalizedPlankEmoji = currentPlankEmoji.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        
-        hasScoredOnCurrentPlank = true // 标记当前木板已判定
 
+        // 判断匹配情况
         if normalizedDetected == normalizedPlankEmoji {
-            score += 100
+            hasScoredOnCurrentPlank = true
+            score += 100 // 增加分数
             print("Matched! Score added: \(score)")
-            playSuccessSound() // 成功音效
+            playSuccessSound() // 播放成功音效
             return true
         } else {
-            print("No Match! Current Score: \(score)")
-            playFailureSound() // 失败音效
+            if !hasScoredOnCurrentPlank { // 确保只在未得分时播放失败音效
+                print("No Match! Current Score: \(score)")
+                playFailureSound()
+            }
+            return false
         }
-        return false
     }
 
     // 播放成功音效
