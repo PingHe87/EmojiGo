@@ -19,7 +19,7 @@ class EmotionAnalyzer {
     private func setupEmotionModel() {
         do {
             // 加载 CoreML 模型
-            emotionModel = try VNCoreMLModel(for: EmojiChallengeClassfier().model)
+            emotionModel = try VNCoreMLModel(for:EmojiChallengeClassfier_2().model)
             emotionRequest = VNCoreMLRequest(model: emotionModel, completionHandler: nil)
         } catch {
             fatalError("Failed to load CoreML model: \(error)")

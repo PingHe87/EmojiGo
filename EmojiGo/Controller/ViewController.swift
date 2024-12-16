@@ -126,7 +126,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
 
     private func handleDetectedEmotion(_ detectedEmotion: String) {
         // 只允许 "fear", "happy", "surprise" 这三个表情
-        let validEmotions = ["fear", "happy", "surprise"]
+        let validEmotions = ["fear", "happy", "surprise",]
 
         // 检查检测到的表情是否在允许范围内
         let normalizedEmotion = detectedEmotion.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
