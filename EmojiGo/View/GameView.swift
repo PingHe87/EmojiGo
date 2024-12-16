@@ -131,6 +131,12 @@ class GameView {
         homeHandler?()
     }
     
+    
+    func resetDetectedEmotionLabel() {
+        detectedEmotionLabel.text = "" // 清空检测到的表情显示
+        detectedEmotionLabel.backgroundColor = .clear // 恢复背景颜色
+    }
+
 
     private var restartHandler: (() -> Void)?
     private var homeHandler: (() -> Void)?

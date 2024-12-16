@@ -19,7 +19,7 @@ class GameModel {
 
     // 游戏状态变量
     var isPlankOnScreen = false
-    var countdownValue = 30
+    var countdownValue = 60
     var score = 0 // 游戏分数
 
     // 当前木板状态
@@ -31,7 +31,7 @@ class GameModel {
     // 重置游戏状态
     func reset() {
         isPlankOnScreen = false
-        countdownValue = 30
+        countdownValue = 60
         score = 0
         resetCurrentPlankState() // 重置当前木板状态
     }

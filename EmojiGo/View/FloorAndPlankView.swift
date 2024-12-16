@@ -13,7 +13,7 @@ class FloorAndPlankView {
     var isPlankOnScreen = false
     private var hasAddedInitialFloors = false // 标志位，防止重复添加地板
     private var plankTimer: Timer? 
-    private var isGameRunning = true
+    var isGameRunning = true
 
     init(sceneView: ARSCNView) {
         self.sceneView = sceneView

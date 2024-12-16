@@ -49,7 +49,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
         // 启动游戏的预启动倒计时
         startPreStartCountdown()
         
-//        // 启动游戏
 //        setupGame() // 添加这一行，初始化倒计时
 
         // 延迟启动表情检测
@@ -178,7 +177,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     private func endGame() {
         // 停止倒计时定时器
         countdownTimer?.invalidate()
-        
         // 停止游戏逻辑
         floorAndPlankView.stopGame()
         
@@ -191,8 +189,29 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     }
 
     private func restartGame() {
+        // 停止游戏逻辑并清理场景
+        floorAndPlankView.stopGame()
+
+        // 重置游戏模型状态
+        gameModel.reset()
+
+        // 重新初始化场景
+        floorAndPlankView.addInitialFloors() // 添加初始地板
+        floorAndPlankView.startPlankRefreshTimer() // 启动木板定时器
+
+        // 更新 UI
+        gameView.updateCountdownLabel(with: gameModel.countdownValue)
+        gameView.resetDetectedEmotionLabel() // 重置表情显示状态
         gameView.removeGameOverlay()
-        setupGame()
+
+        // 重启倒计时
+        startCountdown()
+
+        // 确保游戏运行标志被重新启用
+        floorAndPlankView.isGameRunning = true
+
+        print("Game restarted successfully!")
+
     }
 
     private func navigateToHome() {
