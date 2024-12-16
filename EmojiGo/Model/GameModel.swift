@@ -9,68 +9,68 @@ import Foundation
 import AVFoundation
 
 class GameModel {
-    // 单例共享实例
+    // Singleton shared instance
     static let shared = GameModel()
     var audioPlayer: AVAudioPlayer?
     
-    var detectedEmotion: String? = nil // 当前检测到的表情
+    var detectedEmotion: String? = nil // Currently detected emotion
     
-    private init() {} // 防止外部初始化
+    private init() {} // Prevent external initialization
 
-    // 游戏状态变量
+    // Game state variables
     var isPlankOnScreen = false
     var countdownValue = 60
-    var score = 0 // 游戏分数
+    var score = 0 // Game score
 
-    // 当前木板状态
-    var matchingTime: TimeInterval = 0 // 匹配时间累计
-    var currentPlankEmoji: String? // 当前木板上的表情
-    var hasScoredOnCurrentPlank = false // 是否已经为当前木板计分
-    var hasFailedOnCurrentPlank = false // 是否已经播放过失败音效
+    // Current plank state
+    var matchingTime: TimeInterval = 0 // Accumulated matching time
+    var currentPlankEmoji: String? // Emoji on the current plank
+    var hasScoredOnCurrentPlank = false // Whether the current plank has been scored
+    var hasFailedOnCurrentPlank = false // Whether the failure sound has already been played for the current plank
 
-    // 重置游戏状态
+    // Reset game state
     func reset() {
         isPlankOnScreen = false
         countdownValue = 60
         score = 0
-        resetCurrentPlankState() // 重置当前木板状态
+        resetCurrentPlankState() // Reset the state of the current plank
     }
 
-    // 重置当前木板状态
+    // Reset the state of the current plank
     func resetCurrentPlankState() {
         currentPlankEmoji = nil
         hasScoredOnCurrentPlank = false
         hasFailedOnCurrentPlank = false
-        detectedEmotion = nil // 清空检测到的表情，确保下一块木板可以正常匹配
+        detectedEmotion = nil // Clear the detected emotion to ensure the next plank can match correctly
     }
 
-    // 更新倒计时
+    // Update countdown
     func updateCountdown() -> Bool {
         countdownValue -= 1
-        return countdownValue <= 0 // 返回是否倒计时结束
+        return countdownValue <= 0 // Return whether the countdown has ended
     }
 
     
-    // 检查表情匹配
+    // Check emotion match
     func checkEmotionMatch(detectedEmotion: String) -> Bool {
-        // 确保当前有木板表情并且尚未判定得分
+        // Ensure there is a current plank emoji and it has not been scored
         guard let currentPlankEmoji = currentPlankEmoji, !hasScoredOnCurrentPlank else {
             return false
         }
 
-        // 标准化表情和木板表情，去除空格并转为小写
+        // Normalize the detected emotion and plank emoji by trimming whitespace and converting to lowercase
         let normalizedDetected = detectedEmotion.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         let normalizedPlankEmoji = currentPlankEmoji.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
-        // 判断匹配情况
+        // Determine matching status
         if normalizedDetected == normalizedPlankEmoji {
             hasScoredOnCurrentPlank = true
-            score += 100 // 增加分数
+            score += 100 // Increase score
             print("Matched! Score added: \(score)")
-            playSuccessSound() // 播放成功音效
+            playSuccessSound() // Play success sound
             return true
         } else {
-            if !hasScoredOnCurrentPlank { // 确保只在未得分时播放失败音效
+            if !hasScoredOnCurrentPlank { // Ensure failure sound is played only when not scored
                 print("No Match! Current Score: \(score)")
                 playFailureSound()
             }
@@ -78,24 +78,22 @@ class GameModel {
         }
     }
 
-    // 播放成功音效
     func playSuccessSound() {
         playSound(resourceName: "success")
     }
 
-    // 播放失败音效
     func playFailureSound() {
         playSound(resourceName: "failure")
     }
 
-    // 通用音效播放方法
+    // General method for playing sound effects
     private func playSound(resourceName: String) {
         guard let soundURL = Bundle.main.url(forResource: resourceName, withExtension: "wav") else {
             print("Sound file \(resourceName) not found.")
             return
         }
         
-        // 设置 AudioSession
+        // Configure AudioSession
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
@@ -103,7 +101,7 @@ class GameModel {
             print("Failed to set audio session: \(error.localizedDescription)")
         }
         
-        // 播放音效
+        // Play sound effect
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             audioPlayer?.play()

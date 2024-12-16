@@ -11,22 +11,22 @@ import CoreVideo
 class ImagePreprocessor {
     private let ciContext = CIContext()
     
-    /// 对输入的 PixelBuffer 进行亮度和对比度的处理
+    // Adjust the brightness and contrast of the input PixelBuffer
     func process(pixelBuffer: CVPixelBuffer) -> CVPixelBuffer? {
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         
-        // 创建亮度和对比度调整滤镜
+        // Create a filter for brightness and contrast adjustment
         let filter = CIFilter(name: "CIColorControls")
         filter?.setValue(ciImage, forKey: kCIInputImageKey)
-        filter?.setValue(0.3, forKey: "inputBrightness") // 提高亮度 (默认值为0.0)
-        filter?.setValue(1.2, forKey: "inputContrast")   // 增强对比度 (默认值为1.0)
+        filter?.setValue(0.3, forKey: "inputBrightness") // Increase brightness (default value is 0.0)
+        filter?.setValue(1.2, forKey: "inputContrast")   // Enhance contrast (default value is 1.0)
         
         guard let outputImage = filter?.outputImage else {
             print("Failed to process image with CIColorControls.")
             return nil
         }
         
-        // 渲染输出为新的 PixelBuffer
+        // Render the output as a new PixelBuffer
         var newPixelBuffer: CVPixelBuffer?
         let status = CVPixelBufferCreate(kCFAllocatorDefault,
                                          CVPixelBufferGetWidth(pixelBuffer),

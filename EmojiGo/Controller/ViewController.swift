@@ -21,43 +21,43 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     private var countdownTimer: Timer?
     private var floorAndPlankView: FloorAndPlankView!
     
-    private var hasStartedFaceDetection = false // 防止重复启动表情检测
-    private var preStartCountdownLabel: UILabel! // 用于显示 "3, 2, 1, Go!"
+    private var hasStartedFaceDetection = false // Prevent duplicate start of face detection
+    private var preStartCountdownLabel: UILabel! // Used to display "3, 2, 1, Go!"
     
-    private let imagePreprocessor = ImagePreprocessor() // 添加预处理器实例
+    private let imagePreprocessor = ImagePreprocessor() // Add preprocessor instance
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // 初始化 AR 会话
+        // Initialize AR session
         sceneView.delegate = self
         sceneView.scene = SCNScene()
         arSetup = ARSetup(sceneView: sceneView)
 
-        // 添加初始地板
+        // Add initial floor
         floorAndPlankView = FloorAndPlankView(sceneView: sceneView)
         floorAndPlankView.addInitialFloors()
-        // 启动木板固定间隔刷新
+        // Start plank periodic refresh
             floorAndPlankView.startPlankRefreshTimer()
 
-        // 初始化其他组件
-        emotionAnalyzer = EmotionAnalyzer() // 确保初始化
+        // Ensure initialization
+        emotionAnalyzer = EmotionAnalyzer()
         gameView = GameView(frame: view.bounds)
         gameView.setupUI(in: view)
         
-        // 启动游戏的预启动倒计时
+        // Start the pre-start countdown of the game
         startPreStartCountdown()
         
-//        setupGame() // 添加这一行，初始化倒计时
+//        setupGame()
 
-        // 延迟启动表情检测
+        // Delay the start of face detection
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             print("Starting face detection...")
             self.startFaceDetection()
         }
     }
-    // MARK: - 游戏预启动倒计时
+    // MARK: - Game pre-start countdown
         private func startPreStartCountdown() {
             preStartCountdownLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
             preStartCountdownLabel.center = view.center
@@ -69,7 +69,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
 
             var countdownValue = 3
 
-            // 倒计时逻辑
+            // Countdown logic
             Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
                 guard let self = self else { return }
 
@@ -80,14 +80,14 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
                     self.preStartCountdownLabel.text = "Go!"
                     countdownValue -= 1
                 } else {
-                    // 倒计时结束，移除标签并启动游戏
+                    // Countdown ends, remove label and start the game
                     self.preStartCountdownLabel.removeFromSuperview()
                     timer.invalidate()
                     self.startGame()
                 }
             }
         }
-    // MARK: - 启动游戏
+    // MARK: - Start game
         private func startGame() {
             setupGame()
             startFaceDetection()
@@ -108,7 +108,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
                 return
             }
             
-            // 对帧进行预处理
+            // Preprocess the frame
             if let processedPixelBuffer = self.imagePreprocessor.process(pixelBuffer: frame.capturedImage) {
                 self.emotionAnalyzer.analyze(pixelBuffer: processedPixelBuffer) { detectedEmotion in
                     DispatchQueue.main.async {
@@ -124,17 +124,17 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
 
 
     private func handleDetectedEmotion(_ detectedEmotion: String) {
-        // 只允许 "fear", "happy", "surprise" 这三个表情
+        // Only allow "fear," "happy," "surprise" emotions
         let validEmotions = ["fear", "happy", "surprise"]
 
-        // 检查检测到的表情是否在允许范围内
+        // Check if the detected emotion is within the valid range
         let normalizedEmotion = detectedEmotion.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard validEmotions.contains(normalizedEmotion) else {
-            print("Ignored Emotion: \(detectedEmotion)") // 忽略无效表情
+            print("Ignored Emotion: \(detectedEmotion)") // Ignore invalid emotions
             return
         }
 
-        // 确保当前木板存在且尚未进行判定
+        // Ensure the current plank exists and has not been scored
         guard let currentPlankEmoji = GameModel.shared.currentPlankEmoji,
               !GameModel.shared.hasScoredOnCurrentPlank else {
             print("No plank to score or already scored.")
@@ -144,13 +144,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
         //print("Detected Emotion: \(normalizedEmotion)")
         //print("Current Plank Emoji: \(currentPlankEmoji)")
 
-        // 判定是否匹配
+        // Determine if it matches
         let isCorrect = GameModel.shared.checkEmotionMatch(detectedEmotion: normalizedEmotion)
 
-        // 更新 UI，显示匹配结果
+        // Update UI to show match result
         gameView.updateDetectedEmotionLabel(with: normalizedEmotion, isCorrect: isCorrect)
 
-        // 输出结果
+        // Output results
         if isCorrect {
             print("Matched! Current Score: \(GameModel.shared.score)")
         } else {
@@ -175,12 +175,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     }
 
     private func endGame() {
-        // 停止倒计时定时器
+        // Stop countdown timer
         countdownTimer?.invalidate()
-        // 停止游戏逻辑
+        // Stop game logic
         floorAndPlankView.stopGame()
         
-        // 显示结束界面并处理按钮操作
+        // Display the end screen and handle button actions
         gameView.showGameOverlay(in: view, score: gameModel.score, restartHandler: { [weak self] in
             self?.restartGame()
         }, homeHandler: { [weak self] in
@@ -189,25 +189,25 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     }
 
     private func restartGame() {
-        // 停止游戏逻辑并清理场景
+        // Stop game logic and clean up the scene
         floorAndPlankView.stopGame()
 
-        // 重置游戏模型状态
+        // Reset game model state
         gameModel.reset()
 
-        // 重新初始化场景
-        floorAndPlankView.addInitialFloors() // 添加初始地板
-        floorAndPlankView.startPlankRefreshTimer() // 启动木板定时器
+        // Reinitialize the scene
+        floorAndPlankView.addInitialFloors() // Add initial floors
+        floorAndPlankView.startPlankRefreshTimer() // Start plank timer
 
-        // 更新 UI
+        // Update UI
         gameView.updateCountdownLabel(with: gameModel.countdownValue)
-        gameView.resetDetectedEmotionLabel() // 重置表情显示状态
+        gameView.resetDetectedEmotionLabel() // Reset emotion display state
         gameView.removeGameOverlay()
 
-        // 重启倒计时
+        // Restart the countdown
         startCountdown()
 
-        // 确保游戏运行标志被重新启用
+        // Ensure the game running flag is re-enabled
         floorAndPlankView.isGameRunning = true
 
         print("Game restarted successfully!")
@@ -228,7 +228,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
 
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
         if let detectedEmotion = GameModel.shared.detectedEmotion {
-            // 如果木板在屏幕上且尚未判定分数
+            // If the plank is on screen and has not been scored
             if floorAndPlankView.isPlankOnScreen, !GameModel.shared.hasScoredOnCurrentPlank {
                 _ = GameModel.shared.checkEmotionMatch(detectedEmotion: detectedEmotion)
             }

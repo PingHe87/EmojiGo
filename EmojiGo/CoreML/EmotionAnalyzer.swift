@@ -18,7 +18,7 @@ class EmotionAnalyzer {
 
     private func setupEmotionModel() {
         do {
-            // 加载 CoreML 模型
+            // // Load the CoreML model
             emotionModel = try VNCoreMLModel(for:EmojiChallengeClassfier_2().model)
             emotionRequest = VNCoreMLRequest(model: emotionModel, completionHandler: nil)
         } catch {
@@ -29,7 +29,7 @@ class EmotionAnalyzer {
     func analyze(pixelBuffer: CVPixelBuffer, completion: @escaping (String?) -> Void) {
         let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
         
-        // 初始化时设置 completionHandler
+        // Set up completionHandler during initialization
         let emotionRequest = VNCoreMLRequest(model: emotionModel) { request, error in
             if let error = error {
                 print("Emotion detection error: \(error.localizedDescription)")
@@ -42,7 +42,7 @@ class EmotionAnalyzer {
                 completion(nil)
                 return
             }
-            completion(topResult.identifier) // 返回识别的表情结果
+            completion(topResult.identifier) // Return the recognized emotion result
         }
 
         do {
