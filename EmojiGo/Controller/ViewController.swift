@@ -126,7 +126,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
 
     private func handleDetectedEmotion(_ detectedEmotion: String) {
         // 只允许 "fear", "happy", "surprise" 这三个表情
-        let validEmotions = ["fear", "happy", "surprise",]
+        let validEmotions = ["fear", "happy", "surprise"]
 
         // 检查检测到的表情是否在允许范围内
         let normalizedEmotion = detectedEmotion.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -142,8 +142,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
             return
         }
 
-        print("Detected Emotion: \(normalizedEmotion)")
-        print("Current Plank Emoji: \(currentPlankEmoji)")
+        //print("Detected Emotion: \(normalizedEmotion)")
+        //print("Current Plank Emoji: \(currentPlankEmoji)")
 
         // 判定是否匹配
         let isCorrect = GameModel.shared.checkEmotionMatch(detectedEmotion: normalizedEmotion)
@@ -176,7 +176,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionObserver, AR
     }
 
     private func endGame() {
+        // 停止倒计时定时器
         countdownTimer?.invalidate()
+        
+        // 停止游戏逻辑
+        floorAndPlankView.stopGame()
+        
+        // 显示结束界面并处理按钮操作
         gameView.showGameOverlay(in: view, score: gameModel.score, restartHandler: { [weak self] in
             self?.restartGame()
         }, homeHandler: { [weak self] in

@@ -12,7 +12,8 @@ class FloorAndPlankView {
     private let sceneView: ARSCNView
     var isPlankOnScreen = false
     private var hasAddedInitialFloors = false // 标志位，防止重复添加地板
-    private var plankTimer: Timer? // 定时器属性
+    private var plankTimer: Timer? 
+    private var isGameRunning = true
 
     init(sceneView: ARSCNView) {
         self.sceneView = sceneView
@@ -86,6 +87,23 @@ class FloorAndPlankView {
     func stopPlankRefreshTimer() {
            plankTimer?.invalidate()
            plankTimer = nil
+       }
+    
+    func stopGame() {
+           // 停止木板刷新定时器
+           stopPlankRefreshTimer()
+           
+           // 移除所有地板和木板节点
+           for node in sceneView.scene.rootNode.childNodes {
+               if node.name == "floor" || node.name == "plank" {
+                   node.removeFromParentNode()
+               }
+           }
+
+           // 重置状态
+           isPlankOnScreen = false
+           hasAddedInitialFloors = false
+           isGameRunning = false
        }
 
     func slideFloorsAndPlanks() {
