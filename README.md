@@ -1,5 +1,8 @@
 # EmojiGo（Ficial Dash Match）
-
+## **Group Member**
+Tong Li  
+Ping He  
+Shuangling Zhao
 ## **Description**
 This game is a tunnel adventure game based on facial expression recognition. Players use the camera to capture their facial expressions in real time and match them with the emojis displayed on randomly appearing obstacles in the tunnel. 
 
