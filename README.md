@@ -9,23 +9,23 @@ This game is a tunnel adventure game based on facial expression recognition. Pla
 - The game is simple and intuitive to play, offering both **fun and challenges** through real-time interactions.
 ---
 ## **Contents**
-- **EmojiGo/**
-  - **AR/**
+- **EmojiGo**
+  - **AR**
     - ARSetup
-  - **Controller/**
+  - **Controller**
     - ViewController
-  - **CoreML/**
+  - **CoreML**
     - EmojiChallengeClassifier
     - EmotionAnalyzer
     - ImagePreprocessor
-  - **Model/**
+  - **Model**
     - GameModel
-  - **View/**
+  - **View**
     - FloorAndPlankView
     - GameView
     - HomeViewController
   - AppDelegate
-  - **art/**
+  - **art**
   - **Assets/**
     - failure.wav
     - success.wav
